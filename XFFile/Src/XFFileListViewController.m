@@ -55,6 +55,15 @@
     self.dataSource = [NSMutableArray arrayWithArray:[self urlsAtPath:self.path recursive:self.recursive]];
     
     [self.view addSubview:self.tableView];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadTableView) name:kNoti_RecieveNewFile object:nil];
+}
+     
+- (void)reloadTableView {
+    
+    self.dataSource = [NSMutableArray arrayWithArray:[self urlsAtPath:self.path recursive:self.recursive]];
+    
+    [self.tableView reloadData];
 }
 
 #pragma mark - UITableViewDelegate & UITableViewDataSource

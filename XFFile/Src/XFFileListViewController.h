@@ -8,6 +8,8 @@
 
 #import <UIKit/UIKit.h>
 
+#define kNoti_RecieveNewFile @"kNoti_RecieveNewFile"
+
 @interface XFFileListViewController : UIViewController
 
 @property (copy  , nonatomic) NSString *path;
