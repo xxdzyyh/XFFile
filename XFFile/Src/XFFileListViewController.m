@@ -8,11 +8,13 @@
 
 #import "XFFileListViewController.h"
 
-@interface XFFileListViewController () <UITableViewDelegate, UITableViewDataSource>
+@interface XFFileListViewController () <UITableViewDelegate, UITableViewDataSource, UIDocumentInteractionControllerDelegate>
 
 @property (strong, nonatomic) NSMutableArray *dataSource;
 
 @property (strong, nonatomic) UITableView *tableView;
+
+@property (nonatomic, strong) UIDocumentInteractionController *docInteractionController;
 
 @end
 
@@ -57,6 +59,14 @@
 
 #pragma mark - UITableViewDelegate & UITableViewDataSource
 
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
+    
+    NSString *path = self.dataSource[indexPath.row];
+    
+    [self openFileAtPath:path];
+}
+
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     
     return 1;
@@ -89,8 +99,38 @@
     return 44;
 }
 
+#pragma mark - UIDocumentInteractionControllerDelegate
+
+- (UIViewController *)documentInteractionControllerViewControllerForPreview:(UIDocumentInteractionController *)interactionController {
+    return self;
+}
 
 #pragma mark - private method
+
+- (void)openFileAtPath:(NSString *)path {
+    [self setupDocumentControllerWithURL:[NSURL fileURLWithPath:path]];
+    
+    BOOL canOpen = [self.docInteractionController presentPreviewAnimated:YES];
+    if (!canOpen) {
+//        [SVProgressHUD showErrorWithStatus:@"该类型文件无法打开"];
+        
+        NSLog(@"%@",@"该类型文件无法打开");
+    }
+}
+
+- (void)setupDocumentControllerWithURL:(NSURL *)url
+{
+    //checks if docInteractionController has been initialized with the URL
+    if (self.docInteractionController == nil)
+    {
+        self.docInteractionController = [UIDocumentInteractionController interactionControllerWithURL:url];
+        self.docInteractionController.delegate = self;
+    }
+    else
+    {
+        self.docInteractionController.URL = url;
+    }
+}
 
 - (NSArray *)urlsAtPath:(NSString *)path  recursive:(BOOL)recursive {
     NSFileManager * fileManager = [NSFileManager defaultManager];
